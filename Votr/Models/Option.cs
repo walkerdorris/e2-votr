@@ -9,6 +9,6 @@ namespace Votr.Models
     public class Option
     {
         public int OptionId { get; set; }
-        string Content { get; set; }
+        public string Content { get; set; }
     }
 }
