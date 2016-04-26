@@ -18,7 +18,7 @@ namespace Votr.Tests.Models
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof(System.Data.Entity.Validation.DbEntityValidationException))]
         public void PollEnsureICanSaveAPoll()
         {
             // Arrange
