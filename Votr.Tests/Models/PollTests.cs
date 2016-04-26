@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Votr.Models;
 using Votr.DAL;
 using System.Data.Entity;
+using System.Linq;
 
 namespace Votr.Tests.Models
 {
@@ -17,6 +18,7 @@ namespace Votr.Tests.Models
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Validation.DbEntityValidationException))]
         public void PollEnsureICanSaveAPoll()
         {
             // Arrange
@@ -29,9 +31,34 @@ namespace Votr.Tests.Models
 
             // Assert
             Assert.AreEqual(1, context.Polls.Find().PollId);
+        }
 
+        [TestMethod]
+        public void PollEnsureInstanceIsValid()
+        {
+            //Arrange
+            VotrContext context = new VotrContext();
+            Poll p = new Poll();
+            //Act
+            context.Polls.Add(p);
+            //context.SaveChanges();
+            //Assert
+            Assert.IsTrue(context.Polls.Count() > 1);
+            
+        }
 
-
+        [TestMethod]
+        public void PollEnsureInstanceIsValid2()
+        {
+            //Arrange
+            VotrContext context = new VotrContext();
+            //Alternative way of initializing a Poll
+            Poll p = new Poll{ Title = "Another Poll", EndDate = DateTime.Now, StartDate = DateTime.Now};
+            //Act
+            context.Polls.Add(p);
+            //context.SaveChanges();
+            //Assert
+            Assert.IsTrue(context.Polls.Count() > 1);
         }
     }
 }
