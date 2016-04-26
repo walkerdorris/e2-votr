@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Votr.Models;
 using Votr.DAL;
+using System.Data.Entity;
 
 namespace Votr.Tests.Models
 {
@@ -19,7 +20,7 @@ namespace Votr.Tests.Models
         public void PollEnsureICanSaveAPoll()
         {
             // Arrange
-            VotrContext context = new VotrContext("DefaultConnection");
+            VotrContext context = new VotrContext();
             Poll p = new Poll();
 
             // Act
