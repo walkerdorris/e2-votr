@@ -43,10 +43,10 @@ namespace Votr.Tests.Sandbox
             mock_car.Setup(car => car.Horn()).Returns("Beep");
 
             // Act
-            c.MakeNoise();
+            c.MakeNoise(); // This calls the wrong "Horn". Not the mocked method.
 
             // Assert
-            mock_car.Verify(car => car.Horn(), Times.Once); // Look into.
+            mock_car.Verify(car => car.Horn(), Times.Once); // This never runs.
 
         }
     }
