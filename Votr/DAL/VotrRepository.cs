@@ -35,7 +35,9 @@ namespace Votr.DAL
 
         public void AddPoll(string title, DateTime start_time, DateTime end_time)
         {
-            throw new NotImplementedException();
+            Poll new_poll = new Poll { Title = title, EndDate = end_time, StartDate = start_time};
+            context.Polls.Add(new_poll);
+            context.SaveChanges();
         }
         // Create a Poll
 

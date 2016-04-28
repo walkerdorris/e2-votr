@@ -84,7 +84,7 @@ namespace Votr.Tests.DAL
         public void RepoEnsurePollCountIsZero()
         {
             // Arrange 
-            VotrRepository repo = new VotrRepository();
+            ConnectMocksToDatastore();
 
             // Act
             int expected = 0;
@@ -98,7 +98,10 @@ namespace Votr.Tests.DAL
         public void RepoEnsureICanAddPoll()
         {
             // Arrange
-            VotrRepository repo = new VotrRepository();
+            ConnectMocksToDatastore();
+
+            // Hijack the call to the Polls.Add method and put it the list using the List's Add method.
+            mock_polls_table.Setup(m => m.Add(It.IsAny<Poll>())).Callback((Poll poll) => datasource.Add(poll));
 
             // Act
             repo.AddPoll("Some Title", DateTime.Now, DateTime.Now); // Not there yet.
