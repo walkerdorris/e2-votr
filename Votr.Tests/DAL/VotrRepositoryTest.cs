@@ -3,12 +3,27 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Votr.DAL;
 using System.Collections.Generic;
 using Votr.Models;
+using Moq;
+using System.Linq;
+using System.Data.Entity;
 
 namespace Votr.Tests.DAL
 {
     [TestClass]
     public class VotrRepositoryTest
     {
+        [TestInitialize]
+        public void Initialize()
+        {
+
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+
+        }
+
         [TestMethod]
         public void RepoEnsureICanCreateInstance()
         {
