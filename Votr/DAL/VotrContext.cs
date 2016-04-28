@@ -9,7 +9,7 @@ namespace Votr.DAL
 {
     public class VotrContext : DbContext
     {
-        public DbSet<Poll> Polls { get; set; }
-        public DbSet<Option> Options { get; set; }
+        public virtual DbSet<Poll> Polls { get; set; }
+        public virtual DbSet<Option> Options { get; set; }
     }
 }
