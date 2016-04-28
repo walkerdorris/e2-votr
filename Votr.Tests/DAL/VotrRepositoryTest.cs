@@ -16,6 +16,7 @@ namespace Votr.Tests.DAL
         Mock<VotrContext> mock_context { get; set; }
         Mock<DbSet<Poll>> mock_polls_table { get; set; } // Fake Polls table
         VotrRepository repo { get; set; } // Injects mocked (fake) VotrContext
+        IQueryable<Poll> data { get; set; }// Turns List<Poll> into something we can query with LINQ
 
         [TestInitialize]
         public void Initialize()
@@ -25,6 +26,7 @@ namespace Votr.Tests.DAL
             mock_polls_table = new Mock<DbSet<Poll>>(); // Fake Polls table
 
             repo = new VotrRepository(mock_context.Object); // Injects mocked (fake) VotrContext
+            data = datasource.AsQueryable(); // Turns List<Poll> into something we can query with LINQ
         }
 
         [TestCleanup]
@@ -35,7 +37,14 @@ namespace Votr.Tests.DAL
 
         void ConnectMocksToDatastore() // Utility method
         {
+            // Telling our fake DbSet to use our datasource like something Queryable
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.ElementType).Returns(data.ElementType);
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Expression).Returns(data.Expression);
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Provider).Returns(data.Provider);
 
+            // Tell our mocked VotrContext to use our fully mocked Datasource. (List<Poll>)
+            mock_context.Setup(m => m.Polls).Returns(mock_polls_table.Object);
         }
 
         [TestMethod]
@@ -60,18 +69,8 @@ namespace Votr.Tests.DAL
         [TestMethod]
         public void RepoEnsureThereAreNoPolls()
         {
-           
-            //IQueryable<Poll> data = datasource.AsQueryable(); // Turns List<Poll> into something we can query with LINQ
-            var data = datasource.AsQueryable(); // This is cool too. Casting (too)
-
-            // Telling our fake DbSet to use our datasource like something Queryable
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.ElementType).Returns(data.ElementType);
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Expression).Returns(data.Expression);
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Provider).Returns(data.Provider);
-
-            // Tell our mocked VotrContext to use our fully mocked Datasource. (List<Poll>)
-            mock_context.Setup(m => m.Polls).Returns(mock_polls_table.Object);
+            // Arrange 
+            ConnectMocksToDatastore();
 
             // Act
             List<Poll> list_of_polls = repo.GetPolls();
