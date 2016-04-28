@@ -12,14 +12,28 @@ namespace Votr.Tests.DAL
     [TestClass]
     public class VotrRepositoryTest
     {
+        List<Poll> datasource { get; set; }
+        Mock<VotrContext> mock_context { get; set; }
+        Mock<DbSet<Poll>> mock_polls_table { get; set; } // Fake Polls table
+        VotrRepository repo { get; set; } // Injects mocked (fake) VotrContext
+
         [TestInitialize]
         public void Initialize()
         {
+            datasource = new List<Poll>();
+            mock_context = new Mock<VotrContext>();
+            mock_polls_table = new Mock<DbSet<Poll>>(); // Fake Polls table
 
+            repo = new VotrRepository(mock_context.Object); // Injects mocked (fake) VotrContext
         }
 
         [TestCleanup]
         public void Cleanup()
+        {
+            datasource = null;
+        }
+
+        void ConnectMocksToDatastore() // Utility method
         {
 
         }
@@ -27,7 +41,7 @@ namespace Votr.Tests.DAL
         [TestMethod]
         public void RepoEnsureICanCreateInstance()
         {
-            VotrRepository repo = new VotrRepository();
+            //VotrRepository repo = new VotrRepository();
             Assert.IsNotNull(repo);
         }
 
@@ -35,7 +49,7 @@ namespace Votr.Tests.DAL
         public void RepoEnsureIsUsingContext()
         {
             // Arrange 
-            VotrRepository repo = new VotrRepository();
+            //VotrRepository repo = new VotrRepository();
 
             // Act
 
@@ -46,13 +60,7 @@ namespace Votr.Tests.DAL
         [TestMethod]
         public void RepoEnsureThereAreNoPolls()
         {
-            // Mocking
-            List<Poll> datasource = new List<Poll>();
-            Mock<VotrContext> mock_context = new Mock<VotrContext>();
-            Mock<DbSet<Poll>> mock_polls_table = new Mock<DbSet<Poll>>(); // Fake Polls table
-
-            // Arrange 
-            VotrRepository repo = new VotrRepository(mock_context.Object); // Injects mocked (fake) VotrContext
+           
             //IQueryable<Poll> data = datasource.AsQueryable(); // Turns List<Poll> into something we can query with LINQ
             var data = datasource.AsQueryable(); // This is cool too. Casting (too)
 
