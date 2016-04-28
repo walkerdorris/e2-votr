@@ -16,6 +16,11 @@ namespace Votr.DAL
             context = new VotrContext();
         }
 
+        public VotrRepository(VotrContext _context)
+        {
+            context = _context;
+        }
+
         public int GetPollCount()
         {
             //return GetPolls().Count;
