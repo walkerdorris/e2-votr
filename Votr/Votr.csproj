@@ -225,6 +225,7 @@
     <Compile Include="Models\Poll.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sandbox\Car.cs" />
+    <Compile Include="Sandbox\IOne.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
