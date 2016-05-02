@@ -39,6 +39,32 @@ namespace Votr.DAL
             context.Polls.Add(new_poll);
             context.SaveChanges();
         }
+
+        public Poll GetPoll(int _poll_id)
+        {
+            //return context.Polls.Find(_poll_id); //Requires explicit mocking of DbSet.Find method
+            Poll poll;
+            try
+            {
+                poll = context.Polls.First(i => i.PollId == _poll_id);
+            } catch (Exception)
+            {
+                throw new NullReferenceException();
+            }
+            return poll; // Connect MockstoDatastore
+        }
+
+        public void RemovePoll(int _poll_id)
+        {
+            Poll some_poll = context.Polls.First(i => i.PollId == _poll_id);
+            context.Polls.Remove(some_poll);
+            context.SaveChanges();
+        }
+
+        public Poll GetPollOrNull(int _poll_id)
+        {
+            return context.Polls.FirstOrDefault(i => i.PollId == _poll_id);
+        }
         // Create a Poll
 
         // Delete a Poll

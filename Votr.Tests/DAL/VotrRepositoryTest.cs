@@ -100,16 +100,109 @@ namespace Votr.Tests.DAL
             // Arrange
             ConnectMocksToDatastore();
 
+            datasource.Add(new Poll { Title = "blah", EndDate = DateTime.Now, StartDate = DateTime.Now });
+
             // Hijack the call to the Polls.Add method and put it the list using the List's Add method.
             mock_polls_table.Setup(m => m.Add(It.IsAny<Poll>())).Callback((Poll poll) => datasource.Add(poll));
 
             // Act
             repo.AddPoll("Some Title", DateTime.Now, DateTime.Now); // Not there yet.
             int actual = repo.GetPollCount(); 
-            int expected = 1;
+            int expected = 2;
 
             // Assert
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void RepoEnsure()
+        {
+            //Arrange
+            Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            Poll poll_in_db_2 = new Poll { PollId = 1, Title = "Some Title2", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            datasource.Add(poll_in_db);
+            datasource.Add(poll_in_db_2);
+
+            datasource.Remove(poll_in_db_2);
+
+            ConnectMocksToDatastore();
+
+            //Act
+            Poll found_poll = repo.GetPollOrNull(5);
+
+            //Assert
+            Assert.IsNull(found_poll);
+        }
+
+        [TestMethod]
+        [ExpectedException (typeof(NullReferenceException))]
+        public void RepoEnsureICanNotFind()
+        {
+            //Arrange
+            Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            Poll poll_in_db_2 = new Poll { PollId = 1, Title = "Some Title2", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            datasource.Add(poll_in_db);
+            datasource.Add(poll_in_db_2);
+
+            datasource.Remove(poll_in_db_2);
+
+            ConnectMocksToDatastore();
+
+            //Act
+            repo.GetPoll(5);
+
+        }
+
+        [TestMethod]
+        public void RepoEnsureICanDeletePoll()
+        {
+            //Arrange
+            Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            Poll poll_in_db_2 = new Poll { PollId = 1, Title = "Some Title2", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            datasource.Add(poll_in_db);
+            datasource.Add(poll_in_db_2);
+
+            datasource.Remove(poll_in_db_2);
+
+            ConnectMocksToDatastore();
+            mock_polls_table.Setup(m => m.Add(It.IsAny<Poll>())).Callback((Poll poll) => datasource.Add(poll));
+
+            //Act
+            repo.RemovePoll(1);
+
+            //Assert
+            int expected_count = 1;
+            Assert.AreEqual(expected_count, repo.GetPollCount());
+
+            try
+            {
+                repo.GetPoll(1);
+                Assert.Fail();
+            }
+            catch (Exception)
+            {
+
+            }
+            Assert.IsNull(repo.GetPoll(1));
+        }
+
+        [TestMethod]
+        public void RepoEnsureICanGetAPoll()
+        {
+            //Arrange
+            Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            Poll poll_in_db_2 = new Poll { PollId = 1, Title = "Some Title2", StartDate = DateTime.Now, EndDate = DateTime.Now };
+            datasource.Add(poll_in_db);
+            datasource.Add(poll_in_db_2);
+
+            ConnectMocksToDatastore();
+            
+            //Act
+            Poll found_poll = repo.GetPoll(1);
+
+            //Assert
+            Assert.IsNotNull(found_poll);
+            Assert.AreEqual(poll_in_db, found_poll);
         }
     }
 }
