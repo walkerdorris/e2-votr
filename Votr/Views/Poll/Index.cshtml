@@ -4,16 +4,11 @@
 @{
 
     Layout = "~/Views/Shared/_Layout.cshtml";
-    List<Poll> polls = new List<Poll>();
-
-    polls.Add(new Poll { Title = "Obama 2914", StartDate = DateTime.Now, EndDate = DateTime.Now });
-    polls.Add(new Poll { Title = "Best Pizza Joint 2012", StartDate = DateTime.Now, EndDate = DateTime.Now });
-    polls.Add(new Poll { Title = "Best Pizza Joint 2013", StartDate = DateTime.Now, EndDate = DateTime.Now });
 }
 
 <h1>Polls</h1>
 
-@foreach (var item in polls)
+@foreach (var item in ViewBag.Polls)
 {
 <div class="row red">
     <div class="col-md-8 green">
