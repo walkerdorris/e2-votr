@@ -1,5 +1,6 @@
 ﻿@using System.Collections.Generic;
 @using Votr.Models;
+@model IEnumerable<Poll>
 
 @{
 
@@ -8,7 +9,7 @@
 
 <h1>Polls</h1>
 
-@foreach (var item in ViewBag.Polls)
+@foreach (var item in Model)
 {
 <div class="row red">
     <div class="col-md-8 green">
