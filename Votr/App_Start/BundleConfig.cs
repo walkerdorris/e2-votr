@@ -30,6 +30,9 @@ namespace Votr
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+            bundles.Add(new StyleBundle("~/Scripts/app").Include(
+                "~/Scripts/app.js"
+                ));
         }
     }
 }
