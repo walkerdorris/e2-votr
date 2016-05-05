@@ -47,6 +47,7 @@ namespace Votr.Controllers
         }
 
         // GET: Poll/Edit/5
+        [Authorize]
         public ActionResult Edit(int id)
         {
             Poll found_poll = Repo.GetPollOrNull(id);
