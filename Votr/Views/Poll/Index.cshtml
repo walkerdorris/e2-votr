@@ -11,16 +11,21 @@
 
 @foreach (var item in Model)
 {
-<div class="row red">
-    <div class="col-md-8 green">
+<div class="row">
+    <div class="col-md-8 ">
         @item.Title <br/>
-        my description bllaaaaaaaah!
+        @Html.ActionLink("Edit", "Edit", new { id=@item.PollId})
+        @*Html.ActionLink("Delete", "Delete", new { id = @item.PollId })*@
+        <div class="alert alert-success" role="alert">
+            My 
+        </div>
+        <button ng-confirm-click="showPopup()" ng-cl>Delete</button>
     </div>
-    <div class="col-md-2 blue text-center">
+    <div class="col-md-2 text-center">
         @item.StartDate <br />
         @item.EndDate
     </div>
-    <div class="col-md-2 blue text-center equal-height">
+    <div class="col-md-2 text-center equal-height">
         <ul>
             <li><button class="action-button">View Results</button></li>
         </ul>
