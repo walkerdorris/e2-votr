@@ -27,9 +27,13 @@
     </div>
 </div>
 }
-
-<div class="row red">
+@if (User.Identity.IsAuthenticated)
+{
+<div class="row">
     <div class="col-md-offset-4">
-        <button>Create a New Poll</button>
+       
+            <button>Create a New Poll</button>
+       
     </div>
 </div>
+}
