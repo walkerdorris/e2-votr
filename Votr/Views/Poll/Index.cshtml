@@ -1,5 +1,6 @@
-﻿@using System.Collections.Generic;
+﻿@using System.Collections.Generic,
 @using Votr.Models;
+@model IEnumerable<Poll>
 
 @{
 
@@ -8,12 +9,16 @@
 
 <h1>Polls</h1>
 
-@foreach (var item in ViewBag.Polls)
+@foreach (var item in Model)
 {
 <div class="row red">
     <div class="col-md-8 green">
         @item.Title <br/>
-        my description bllaaaaaaaah!
+        @Html.ActionLink("Edit", "Edit", new { id = @item.PollId })
+        @Html.ActionLink("Delete", "Delete", new { id = @item.PollId })
+
+        <button ng-click="showPopup()" ng-cl>Delete</button>
+        <a href="/Poll/Edit@{@item.PollId}">Edit</a>
     </div>
     <div class="col-md-2 blue text-center">
         @item.StartDate <br />
@@ -29,6 +34,9 @@
 
 <div class="row red">
     <div class="col-md-offset-4">
-        <button>Create a New Poll</button>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <button>Create a New Poll</button>
+        }
     </div>
 </div>
