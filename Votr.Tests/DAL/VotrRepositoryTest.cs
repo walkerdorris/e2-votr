@@ -12,39 +12,82 @@ namespace Votr.Tests.DAL
     [TestClass]
     public class VotrRepositoryTest
     {
-        List<Poll> datasource { get; set; }
         Mock<VotrContext> mock_context { get; set; }
-        Mock<DbSet<Poll>> mock_polls_table { get; set; } // Fake Polls table
         VotrRepository repo { get; set; } // Injects mocked (fake) VotrContext
-        IQueryable<Poll> data { get; set; }// Turns List<Poll> into something we can query with LINQ
+
+        // Polls
+        List<Poll> polls_datasource { get; set; } 
+        Mock<DbSet<Poll>> mock_polls_table { get; set; } // Fake Polls table
+        IQueryable<Poll> poll_data { get; set; }// Turns List<Poll> into something we can query with LINQ
+
+        // Tags
+        List<Tag> tags_datasource { get; set; }
+        Mock<DbSet<Tag>> mock_tags_table { get; set; } // Fake Tags table
+        IQueryable<Tag> tag_data { get; set; }
+
+        // PollTags
+        List<PollTag> polltags_datasource { get; set; }
+        Mock<DbSet<PollTag>> mock_polltags_table { get; set; } // Fake Tags table
+        IQueryable<PollTag> polltag_data { get; set; }
+
 
         [TestInitialize]
         public void Initialize()
         {
-            datasource = new List<Poll>();
             mock_context = new Mock<VotrContext>();
+
+            tags_datasource = new List<Tag>();
+            polls_datasource = new List<Poll>();
+            polltags_datasource = new List<PollTag>();
+
+
             mock_polls_table = new Mock<DbSet<Poll>>(); // Fake Polls table
+            mock_tags_table = new Mock<DbSet<Tag>>();
+            mock_polltags_table = new Mock<DbSet<PollTag>>();
+
 
             repo = new VotrRepository(mock_context.Object); // Injects mocked (fake) VotrContext
-            data = datasource.AsQueryable(); // Turns List<Poll> into something we can query with LINQ
+            poll_data = polls_datasource.AsQueryable(); // Turns List<Poll> into something we can query with LINQ
+            tag_data = tags_datasource.AsQueryable();
+            polltag_data = polltags_datasource.AsQueryable();
+
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            datasource = null;
+            polls_datasource = null;
         }
 
         void ConnectMocksToDatastore() // Utility method
         {
             // Telling our fake DbSet to use our datasource like something Queryable
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator());
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.ElementType).Returns(data.ElementType);
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Expression).Returns(data.Expression);
-            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Provider).Returns(data.Provider);
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.GetEnumerator()).Returns(poll_data.GetEnumerator());
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.ElementType).Returns(poll_data.ElementType);
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Expression).Returns(poll_data.Expression);
+            mock_polls_table.As<IQueryable<Poll>>().Setup(m => m.Provider).Returns(poll_data.Provider);
 
             // Tell our mocked VotrContext to use our fully mocked Datasource. (List<Poll>)
             mock_context.Setup(m => m.Polls).Returns(mock_polls_table.Object);
+
+
+            // Telling our fake DbSet to use our datasource like something Queryable
+            mock_polltags_table.As<IQueryable<PollTag>>().Setup(m => m.GetEnumerator()).Returns(polltag_data.GetEnumerator());
+            mock_polltags_table.As<IQueryable<PollTag>>().Setup(m => m.ElementType).Returns(polltag_data.ElementType);
+            mock_polltags_table.As<IQueryable<PollTag>>().Setup(m => m.Expression).Returns(polltag_data.Expression);
+            mock_polltags_table.As<IQueryable<PollTag>>().Setup(m => m.Provider).Returns(polltag_data.Provider);
+
+            // Tell our mocked VotrContext to use our fully mocked Datasource. (List<PollTag>)
+            mock_context.Setup(m => m.PollTagRelations).Returns(mock_polltags_table.Object);
+
+            // Telling our fake DbSet to use our datasource like something Queryable
+            mock_tags_table.As<IQueryable<Tag>>().Setup(m => m.GetEnumerator()).Returns(tag_data.GetEnumerator());
+            mock_tags_table.As<IQueryable<Tag>>().Setup(m => m.ElementType).Returns(tag_data.ElementType);
+            mock_tags_table.As<IQueryable<Tag>>().Setup(m => m.Expression).Returns(tag_data.Expression);
+            mock_tags_table.As<IQueryable<Tag>>().Setup(m => m.Provider).Returns(tag_data.Provider);
+
+            // Tell our mocked VotrContext to use our fully mocked Datasource. (List<Tag>)
+            mock_context.Setup(m => m.Tags).Returns(mock_tags_table.Object);
         }
 
         [TestMethod]
@@ -101,9 +144,10 @@ namespace Votr.Tests.DAL
             ConnectMocksToDatastore();
 
             // Hijack the call to the Polls.Add method and put it the list using the List's Add method.
-            mock_polls_table.Setup(m => m.Add(It.IsAny<Poll>())).Callback((Poll poll) => datasource.Add(poll));
+            mock_polls_table.Setup(m => m.Add(It.IsAny<Poll>())).Callback((Poll poll) => polls_datasource.Add(poll));
             // Act
-            repo.AddPoll("Some Title", DateTime.Now, DateTime.Now); // Not there yet.
+            ApplicationUser user = null;
+            repo.AddPoll("Some Title", DateTime.Now, DateTime.Now, user); // Not there yet.
             int actual = repo.GetPollCount(); 
             int expected = 2;
 
@@ -118,10 +162,10 @@ namespace Votr.Tests.DAL
             // Arrange
             Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
             Poll poll_in_db_2 = new Poll { PollId = 2, Title = "Some Title 2", StartDate = DateTime.Now, EndDate = DateTime.Now };
-            datasource.Add(poll_in_db);
-            datasource.Add(poll_in_db_2);
+            polls_datasource.Add(poll_in_db);
+            polls_datasource.Add(poll_in_db_2);
 
-            datasource.Remove(poll_in_db_2);
+            polls_datasource.Remove(poll_in_db_2);
 
             ConnectMocksToDatastore();
 
@@ -139,10 +183,10 @@ namespace Votr.Tests.DAL
             // Arrange
             Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
             Poll poll_in_db_2 = new Poll { PollId = 2, Title = "Some Title 2", StartDate = DateTime.Now, EndDate = DateTime.Now };
-            datasource.Add(poll_in_db);
-            datasource.Add(poll_in_db_2);
+            polls_datasource.Add(poll_in_db);
+            polls_datasource.Add(poll_in_db_2);
 
-            datasource.Remove(poll_in_db_2);
+            polls_datasource.Remove(poll_in_db_2);
 
             ConnectMocksToDatastore();
 
@@ -156,11 +200,11 @@ namespace Votr.Tests.DAL
             // Arrange
             Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
             Poll poll_in_db_2 = new Poll { PollId = 2, Title = "Some Title 2", StartDate = DateTime.Now, EndDate = DateTime.Now };
-            datasource.Add(poll_in_db);
-            datasource.Add(poll_in_db_2);
+            polls_datasource.Add(poll_in_db);
+            polls_datasource.Add(poll_in_db_2);
 
             ConnectMocksToDatastore();
-            mock_polls_table.Setup(m => m.Remove(It.IsAny<Poll>())).Callback((Poll poll) => datasource.Remove(poll));
+            mock_polls_table.Setup(m => m.Remove(It.IsAny<Poll>())).Callback((Poll poll) => polls_datasource.Remove(poll));
 
 
             // Act
@@ -184,8 +228,8 @@ namespace Votr.Tests.DAL
             // Arrange
             Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
             Poll poll_in_db_2 = new Poll { PollId = 2, Title = "Some Title 2", StartDate = DateTime.Now, EndDate = DateTime.Now };
-            datasource.Add(poll_in_db);
-            datasource.Add(poll_in_db_2);
+            polls_datasource.Add(poll_in_db);
+            polls_datasource.Add(poll_in_db_2);
 
             ConnectMocksToDatastore();
 
@@ -203,8 +247,8 @@ namespace Votr.Tests.DAL
             // Arrange
             Poll poll_in_db = new Poll { PollId = 1, Title = "Some Title", StartDate = DateTime.Now, EndDate = DateTime.Now };
             Poll poll_in_db_2 = new Poll { PollId = 2, Title = "Some Title 2", StartDate = DateTime.Now, EndDate = DateTime.Now };
-            datasource.Add(poll_in_db);
-            datasource.Add(poll_in_db_2);
+            polls_datasource.Add(poll_in_db);
+            polls_datasource.Add(poll_in_db_2);
 
             ConnectMocksToDatastore();
 

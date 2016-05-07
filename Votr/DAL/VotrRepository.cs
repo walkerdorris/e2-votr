@@ -33,9 +33,9 @@ namespace Votr.DAL
             return context.Polls.ToList<Poll>();
         }
 
-        public void AddPoll(string title, DateTime start_time, DateTime end_time)
+        public void AddPoll(string title, DateTime start_time, DateTime end_time, ApplicationUser user)
         {
-            Poll new_poll = new Poll { Title = title, EndDate = end_time, StartDate = start_time};
+            Poll new_poll = new Poll { Title = title, EndDate = end_time, StartDate = start_time, CreatedBy = user};
             context.Polls.Add(new_poll);
             context.SaveChanges();
         }
