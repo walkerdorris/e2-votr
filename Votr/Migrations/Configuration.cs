@@ -1,11 +1,9 @@
 namespace Votr.Migrations
 {
-    using Models;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
-    using System.Collections.Generic;
 
     internal sealed class Configuration : DbMigrationsConfiguration<Votr.DAL.VotrContext>
     {
@@ -28,27 +26,6 @@ namespace Votr.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
-
-            DateTime basetime = DateTime.Now;
-
-
-            context.Polls.AddOrUpdate(
-                poll => poll.Title, // Is it in the database already?
-                new Poll { Title = "Best Pizza Joint 2014", StartDate = basetime, EndDate = basetime.AddDays(1) },
-                new Poll { Title = "Best Pizza Joint 2012", StartDate = basetime.AddMonths(2), EndDate = basetime.AddMonths(2).AddHours(6) },
-                new Poll { Title = "Best Pizza Joint 2013", StartDate = basetime.AddHours(1), EndDate = basetime.AddHours(7) },
-                new Poll { Title = "Best Pizza Joint 2015", StartDate = basetime, EndDate = basetime.AddMonths(1).AddDays(1).AddHours(12) }
-            );
-
-            string[] some_tags = new string[] { "food", "nashville", "cookiemonster" };
-
-            foreach (var item in some_tags)
-            {
-                context.Tags.AddOrUpdate(
-                    tag => tag.Name,
-                    new Tag { Name = item }
-                );
-            }
         }
     }
 }
